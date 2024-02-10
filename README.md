@@ -1,1 +1,1 @@
-# practice-chat-server
+# chat-server
