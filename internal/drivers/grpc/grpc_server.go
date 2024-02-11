@@ -23,24 +23,24 @@ func NewServer() *server {
 }
 
 // Create implements desc.ChatV1Server
-func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
+func (s *server) Create(_ context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
 	slog.Info("GetMessages", "request", req)
-	defer ctx.Done()
+
 	return &desc.CreateResponse{
 		Id: gofakeit.Int64(),
 	}, nil
 }
 
 // Delete implements desc.ChatV1Server
-func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
+func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
 	slog.Info("GetMessages", "request", req)
-	defer ctx.Done()
+
 	return &emptypb.Empty{}, nil
 }
 
 // SendMessage implements desc.ChatV1Server
-func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
+func (s *server) SendMessage(_ context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
 	slog.Info("GetMessages", "request", req)
-	defer ctx.Done()
+
 	return &emptypb.Empty{}, nil
 }
