@@ -24,38 +24,37 @@ func main() {
 
 	cfg, err := config.Get()
 	if err != nil {
-		slog.Warn("failed to get config", "Error", err)
+		log.Fatalf("failed to get config: %v", err)
 	}
+
 	dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Db, cfg.Database.Pass)
-
 	pgx, err := pgxpool.New(ctx, dsn)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
+	defer pgx.Close()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.GRPC.Port))
-	if err != nil {
-		slog.Warn("failed to listen", "Error", err)
-	}
 	repoC, err := dchat.New(pgx)
 	if err != nil {
-		slog.Warn("failed to create repo", "Error", err)
+		log.Fatalf("failed to create repo: %v", err)
 	}
 	repoM, err := dmsg.New(pgx)
 	if err != nil {
-		slog.Warn("failed to create repo", "Error", err)
+		log.Fatalf("failed to create repo: %v", err)
 	}
 	cs := chat.NewService(repoC, repoM)
 
 	s := grpc.NewServer()
 	reflection.Register(s)
-
 	desc.RegisterChatV1Server(s, dgrpc.NewServer(cs))
 
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.GRPC.Port))
+	if err != nil {
+		log.Fatalf("failed to listen port: %v", err)
+	}
 	slog.Info("server listening at", "address", lis.Addr().String())
-
 	if err = s.Serve(lis); err != nil {
-		slog.Warn("failed to serve", "Error", err)
+		log.Fatalf("failed to serve: %v", err)
 	}
 }

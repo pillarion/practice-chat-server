@@ -15,7 +15,6 @@ type MessageDTO struct {
 
 // ToMessage converts a MessageDTO to a desc.Message.
 func (m *MessageDTO) ToMessage() *desc.Message {
-
 	res := &desc.Message{
 		From:      desc.Username(m.From),
 		Content:   m.Content,

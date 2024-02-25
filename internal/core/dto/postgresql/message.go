@@ -1,7 +1,6 @@
 package postgresql
 
 import (
-	"log/slog"
 	"strconv"
 	"time"
 
@@ -22,13 +21,15 @@ type UsernameDTO string
 //
 // It takes a pointer to a MessageDTO and a pointer to a desc.Message as parameters.
 // It does not return anything.
-func (dto *MessageDTO) FromMessage(m *desc.Message) {
-
+func (dto *MessageDTO) FromMessage(m *desc.Message) error {
 	from, err := strconv.ParseInt(string(m.From), 10, 64)
 	if err != nil {
-		slog.Warn("failed to parse from", "Error", err)
+
+		return err
 	}
 	dto.From = from
 	dto.Content = m.Content
 	dto.Timestamp = m.Timestamp
+
+	return nil
 }

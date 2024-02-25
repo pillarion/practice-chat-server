@@ -13,22 +13,24 @@ import (
 // ctx context.Context, message *desc.Message
 // int64, error
 func (p *pg) Insert(ctx context.Context, message *desc.Message) error {
-
 	var messageDTO dto.MessageDTO
-	messageDTO.FromMessage(message)
+	if err := messageDTO.FromMessage(message); err != nil {
 
-	buiderInsert := sq.Insert("messages").
-		PlaceholderFormat(sq.Dollar).
-		Columns("from_id", "content", "timestamp").
-		Values(messageDTO.From, messageDTO.Content, messageDTO.Timestamp)
-
-	query, args, err := buiderInsert.ToSql()
-	if err != nil {
 		return err
 	}
 
+	buiderInsert := sq.Insert(messagesTable).
+		PlaceholderFormat(sq.Dollar).
+		Columns(messagesTableFromColumn, messagesTableContentColumn, messagesTableTimestampColumn).
+		Values(messageDTO.From, messageDTO.Content, messageDTO.Timestamp)
+	query, args, err := buiderInsert.ToSql()
+	if err != nil {
+
+		return err
+	}
 	_, err = p.pgx.Exec(ctx, query, args...)
 	if err != nil {
+
 		return err
 	}
 

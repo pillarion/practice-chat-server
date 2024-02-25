@@ -10,17 +10,18 @@ import (
 )
 
 // SendMessage implements desc.ChatV1Server
-func (s *server) SendMessage(_ context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
-
+func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
 	messageDTO := dto.MessageDTO{
 		From:      req.GetFrom(),
 		Content:   req.GetText(),
 		Timestamp: *req.GetTimestamp(),
 	}
 
-	err := s.chatService.SendMessage(context.Background(), messageDTO.ToMessage())
+	err := s.chatService.SendMessage(ctx, messageDTO.ToMessage())
 	if err != nil {
 		slog.Error("failed to send message", "Error", err)
+
+		return nil, err
 	}
 
 	return &emptypb.Empty{}, nil

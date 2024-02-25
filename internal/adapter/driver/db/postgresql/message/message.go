@@ -6,6 +6,14 @@ import (
 	"github.com/pillarion/practice-chat-server/internal/core/port/repository/message"
 )
 
+const (
+	messagesTable                = "messages"
+	messagesTableIDColumn        = "id"
+	messagesTableFromColumn      = "from_id"
+	messagesTableContentColumn   = "content"
+	messagesTableTimestampColumn = "timestamp"
+)
+
 type pg struct {
 	pgx *pgxpool.Pool
 }

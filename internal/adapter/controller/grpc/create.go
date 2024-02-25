@@ -10,7 +10,6 @@ import (
 
 // Create implements desc.ChatV1Server
 func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
-
 	usernames := make([]model.Username, len(req.Usernames))
 	for i, username := range req.Usernames {
 		usernames[i] = model.Username(username)
@@ -19,6 +18,7 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 	id, err := s.chatService.CreateChat(ctx, usernames)
 	if err != nil {
 		slog.Error("failed to create chat", "Error", err)
+
 		return nil, err
 	}
 
