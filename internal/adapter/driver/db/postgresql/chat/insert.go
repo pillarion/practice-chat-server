@@ -14,7 +14,7 @@ import (
 // int64, error
 func (p *pg) Insert(ctx context.Context, username []desc.Username) (int64, error) {
 	userDTO := username
-	chatName := "chat:"
+	chatName := chatNamePrefix
 	for _, user := range userDTO {
 		chatName += fmt.Sprintf(":%s:", user)
 	}
