@@ -26,13 +26,11 @@ func (p *pg) Insert(ctx context.Context, username []desc.Username) (int64, error
 		Suffix("RETURNING " + chatsTableIDColumn)
 	query, args, err := builderInsertChat.ToSql()
 	if err != nil {
-
 		return 0, err
 	}
 	var chatID int64
 	err = p.pgx.QueryRow(ctx, query, args...).Scan(&chatID)
 	if err != nil {
-
 		return 0, err
 	}
 
@@ -45,12 +43,10 @@ func (p *pg) Insert(ctx context.Context, username []desc.Username) (int64, error
 	}
 	query, args, err = builderInsertChatUsers.ToSql()
 	if err != nil {
-
 		return 0, err
 	}
 	_, err = p.pgx.Exec(ctx, query, args...)
 	if err != nil {
-
 		return 0, err
 	}
 

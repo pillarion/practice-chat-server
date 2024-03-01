@@ -15,12 +15,10 @@ func (p *pg) Delete(ctx context.Context, id int64) error {
 		Where(sq.Eq{chatUsersTableChatIDColumn: id})
 	query, args, err := builderDeleteChatUsers.ToSql()
 	if err != nil {
-
 		return err
 	}
 	_, err = p.pgx.Exec(ctx, query, args...)
 	if err != nil {
-
 		return err
 	}
 
@@ -29,12 +27,10 @@ func (p *pg) Delete(ctx context.Context, id int64) error {
 		Where(sq.Eq{chatsTableIDColumn: id})
 	query, args, err = builderDeleteChat.ToSql()
 	if err != nil {
-
 		return err
 	}
 	_, err = p.pgx.Exec(ctx, query, args...)
 	if err != nil {
-
 		return err
 	}
 

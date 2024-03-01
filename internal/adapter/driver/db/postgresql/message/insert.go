@@ -15,7 +15,6 @@ import (
 func (p *pg) Insert(ctx context.Context, message *desc.Message) error {
 	var messageDTO dto.MessageDTO
 	if err := messageDTO.FromMessage(message); err != nil {
-
 		return err
 	}
 
@@ -25,12 +24,10 @@ func (p *pg) Insert(ctx context.Context, message *desc.Message) error {
 		Values(messageDTO.From, messageDTO.Content, messageDTO.Timestamp)
 	query, args, err := buiderInsert.ToSql()
 	if err != nil {
-
 		return err
 	}
 	_, err = p.pgx.Exec(ctx, query, args...)
 	if err != nil {
-
 		return err
 	}
 

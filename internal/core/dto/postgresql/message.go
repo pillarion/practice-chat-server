@@ -24,7 +24,6 @@ type UsernameDTO string
 func (dto *MessageDTO) FromMessage(m *desc.Message) error {
 	from, err := strconv.ParseInt(string(m.From), 10, 64)
 	if err != nil {
-
 		return err
 	}
 	dto.From = from

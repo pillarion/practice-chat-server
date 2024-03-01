@@ -12,6 +12,5 @@ import (
 // message: *desc.Message
 // error
 func (s *service) SendMessage(ctx context.Context, message *desc.Message) error {
-
 	return s.repoMessage.Insert(ctx, message)
 }
