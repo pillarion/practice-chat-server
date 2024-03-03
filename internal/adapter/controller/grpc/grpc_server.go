@@ -5,7 +5,7 @@ import (
 	desc "github.com/pillarion/practice-chat-server/pkg/chat_v1"
 )
 
-type server struct {
+type Server struct {
 	desc.UnimplementedChatV1Server
 	chatService chat.Service
 }
@@ -13,8 +13,8 @@ type server struct {
 // NewServer creates a new server.
 //
 // It takes a service of type chat.Service as a parameter and returns a pointer to server.
-func NewServer(cs chat.Service) *server {
-	return &server{
+func NewServer(cs chat.Service) *Server {
+	return &Server{
 		chatService: cs,
 	}
 }

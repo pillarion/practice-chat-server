@@ -5,7 +5,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	dto "github.com/pillarion/practice-chat-server/internal/core/dto/postgresql"
-	desc "github.com/pillarion/practice-chat-server/internal/core/model/chat"
+	desc "github.com/pillarion/practice-chat-server/internal/core/model/message"
+	db "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgclient"
 )
 
 // InsertMessage inserts a message into the database.
@@ -26,7 +27,11 @@ func (p *pg) Insert(ctx context.Context, message *desc.Message) error {
 	if err != nil {
 		return err
 	}
-	_, err = p.pgx.Exec(ctx, query, args...)
+	q := db.Query{
+		Name:     "Message.Insert",
+		QueryRaw: query,
+	}
+	_, err = p.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		return err
 	}

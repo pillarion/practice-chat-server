@@ -4,6 +4,7 @@ import (
 	"context"
 
 	sq "github.com/Masterminds/squirrel"
+	db "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgclient"
 )
 
 // DeleteChat deletes a chat by its ID.
@@ -17,7 +18,11 @@ func (p *pg) Delete(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
-	_, err = p.pgx.Exec(ctx, query, args...)
+	q := db.Query{
+		Name:     "Chat.Delete",
+		QueryRaw: query,
+	}
+	_, err = p.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		return err
 	}
@@ -29,7 +34,11 @@ func (p *pg) Delete(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
-	_, err = p.pgx.Exec(ctx, query, args...)
+	q = db.Query{
+		Name:     "Chat.Delete",
+		QueryRaw: query,
+	}
+	_, err = p.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		return err
 	}

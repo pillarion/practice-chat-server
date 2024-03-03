@@ -9,7 +9,7 @@ import (
 )
 
 // Delete implements desc.ChatV1Server
-func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
+func (s *Server) Delete(_ context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
 	err := s.chatService.DeleteChat(context.Background(), req.Id)
 	if err != nil {
 		slog.Error("failed to delete chat", "Error", err)

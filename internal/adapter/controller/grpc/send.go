@@ -10,7 +10,7 @@ import (
 )
 
 // SendMessage implements desc.ChatV1Server
-func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
+func (s *Server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
 	messageDTO := dto.MessageDTO{
 		From:      req.GetFrom(),
 		Content:   req.GetText(),

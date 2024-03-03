@@ -6,6 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	desc "github.com/pillarion/practice-chat-server/internal/core/model/chat"
+	db "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgclient"
 )
 
 // InsertChat inserts a chat into the database for the given usernames.
@@ -29,7 +30,11 @@ func (p *pg) Insert(ctx context.Context, username []desc.Username) (int64, error
 		return 0, err
 	}
 	var chatID int64
-	err = p.pgx.QueryRow(ctx, query, args...).Scan(&chatID)
+	q := db.Query{
+		Name:     "Chat.Insert",
+		QueryRaw: query,
+	}
+	err = p.db.DB().ScanOneContext(ctx, &chatID, q, args...)
 	if err != nil {
 		return 0, err
 	}
@@ -45,7 +50,11 @@ func (p *pg) Insert(ctx context.Context, username []desc.Username) (int64, error
 	if err != nil {
 		return 0, err
 	}
-	_, err = p.pgx.Exec(ctx, query, args...)
+	q = db.Query{
+		Name:     "ChatUsers.Insert",
+		QueryRaw: query,
+	}
+	_, err = p.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		return 0, err
 	}
