@@ -9,7 +9,7 @@ import (
 )
 
 // Create implements desc.ChatV1Server
-func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
+func (s *Server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
 	usernames := make([]model.Username, len(req.Usernames))
 	for i, username := range req.Usernames {
 		usernames[i] = model.Username(username)

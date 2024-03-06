@@ -1,9 +1,9 @@
 package grpc
 
 import (
+	"github.com/pillarion/practice-chat-server/internal/core/model/chat"
+	"github.com/pillarion/practice-chat-server/internal/core/model/message"
 	"google.golang.org/protobuf/types/known/timestamppb"
-
-	desc "github.com/pillarion/practice-chat-server/internal/core/model/chat"
 )
 
 // MessageDTO is a DTO for a desc.Message.
@@ -14,9 +14,9 @@ type MessageDTO struct {
 }
 
 // ToMessage converts a MessageDTO to a desc.Message.
-func (m *MessageDTO) ToMessage() *desc.Message {
-	res := &desc.Message{
-		From:      desc.Username(m.From),
+func (m *MessageDTO) ToMessage() *message.Message {
+	res := &message.Message{
+		From:      chat.Username(m.From),
 		Content:   m.Content,
 		Timestamp: m.Timestamp.AsTime(),
 	}

@@ -3,7 +3,8 @@ package chat
 import (
 	"context"
 
-	desc "github.com/pillarion/practice-chat-server/internal/core/model/chat"
+	journalModel "github.com/pillarion/practice-chat-server/internal/core/model/journal"
+	desc "github.com/pillarion/practice-chat-server/internal/core/model/message"
 )
 
 // SendMessage sends a message using the given context and message.
@@ -12,5 +13,23 @@ import (
 // message: *desc.Message
 // error
 func (s *service) SendMessage(ctx context.Context, message *desc.Message) error {
-	return s.repoMessage.Insert(ctx, message)
+	err := s.txManager.ReadCommitted(
+		ctx,
+		func(ctx context.Context) error {
+			errTX := s.repoMessage.Insert(ctx, message)
+			if errTX != nil {
+				return errTX
+			}
+
+			_, errTX = s.repoJournal.Insert(ctx, &journalModel.Journal{
+				Action: "Message sent",
+			})
+			if errTX != nil {
+				return errTX
+			}
+
+			return nil
+		})
+
+	return err
 }

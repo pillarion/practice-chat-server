@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	desc "github.com/pillarion/practice-chat-server/internal/core/model/chat"
+	model "github.com/pillarion/practice-chat-server/internal/core/model/message"
 )
 
 // MessageDTO is a DTO for a desc.Message.
@@ -21,7 +21,7 @@ type UsernameDTO string
 //
 // It takes a pointer to a MessageDTO and a pointer to a desc.Message as parameters.
 // It does not return anything.
-func (dto *MessageDTO) FromMessage(m *desc.Message) error {
+func (dto *MessageDTO) FromMessage(m *model.Message) error {
 	from, err := strconv.ParseInt(string(m.From), 10, 64)
 	if err != nil {
 		return err
