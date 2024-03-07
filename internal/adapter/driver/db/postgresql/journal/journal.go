@@ -2,7 +2,7 @@ package journal
 
 import (
 	"github.com/pillarion/practice-chat-server/internal/core/port/repository/journal"
-	db "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgclient"
+	db "github.com/pillarion/practice-platform/pkg/dbclient"
 )
 
 const (
