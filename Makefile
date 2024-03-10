@@ -6,6 +6,7 @@ install-golangci-lint:
 install-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
+	go install github.com/gojuno/minimock/v3/cmd/minimock@v3.3.6
 
 get-deps:
 	go get -u google.golang.org/protobuf/cmd/protoc-gen-go
@@ -26,3 +27,19 @@ generate-chat-api:
 	--go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	api/chat_v1/chat.proto 
+
+test:
+	go clean -testcache
+	go test ./... -covermode count  -count 5
+
+
+test-coverage:
+	go clean -testcache
+	go test ./... -coverprofile=coverage.tmp.out -covermode count  -count 5
+	grep -v 'mock\|config\|_test\|chat_v1' coverage.tmp.out  > coverage.out
+	rm coverage.tmp.out
+	go tool cover -html=coverage.out -o coverage.html;
+	go tool cover -func=./coverage.out | grep "total";
+
+generate-mock:
+	go generate ./...
