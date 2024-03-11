@@ -65,7 +65,6 @@ func Test_service_CreateChat(t *testing.T) {
 		want            int64
 		wantErr         bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "success case",
 			chatRepoMock: func(mc *minimock.Controller) chatRepo.Repo {

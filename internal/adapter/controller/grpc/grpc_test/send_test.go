@@ -51,7 +51,6 @@ func TestServer_SendMessage(t *testing.T) {
 		want    *emptypb.Empty
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "success case",
 			service: func(mc *minimock.Controller) chatService.Service {

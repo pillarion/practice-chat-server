@@ -63,7 +63,6 @@ func Test_service_SendMessage(t *testing.T) {
 		want            error
 		wantErr         bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "success case",
 			chatRepoMock: func(mc *minimock.Controller) chatRepo.Repo {

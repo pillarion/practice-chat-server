@@ -52,7 +52,6 @@ func TestServer_Create(t *testing.T) {
 		want    *desc.CreateResponse
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "success case",
 			service: func(mc *minimock.Controller) chatService.Service {
