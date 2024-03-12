@@ -1,7 +1,7 @@
 package chat
 
 import (
-	db "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgclient"
+	db "github.com/pillarion/practice-platform/pkg/dbclient"
 
 	"github.com/pillarion/practice-chat-server/internal/core/port/repository/chat"
 )

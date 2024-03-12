@@ -16,19 +16,18 @@ import (
 	messageRepoPort "github.com/pillarion/practice-chat-server/internal/core/port/repository/message"
 	chatServicePort "github.com/pillarion/practice-chat-server/internal/core/port/service/chat"
 	chatService "github.com/pillarion/practice-chat-server/internal/core/service/chat"
-	pgClientDriver "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/adapter/pgclient"
-	txManagerDriver "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/adapter/pgtxmanager"
-	pgClientRepoPort "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgclient"
-	txManagerRepoPort "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgtxmanager"
-	pgClientService "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/service/pgclient"
+
+	clsr "github.com/pillarion/practice-platform/pkg/closer"
+	pgClient "github.com/pillarion/practice-platform/pkg/dbclient"
+	txManager "github.com/pillarion/practice-platform/pkg/pgtxmanager"
 )
 
 type serviceProvider struct {
 	config *config.Config
 
-	dbDriver          pgClientRepoPort.DB
-	dbClient          pgClientRepoPort.Client
-	txManager         txManagerRepoPort.TxManager
+	dbDriver          pgClient.DB
+	dbClient          pgClient.Client
+	txManager         txManager.TxManager
 	chatRepository    chatRepoPort.Repo
 	messageRepository messageRepoPort.Repo
 	journalRepository journalRepoPort.Repo
@@ -55,7 +54,7 @@ func (s *serviceProvider) Config() *config.Config {
 	return s.config
 }
 
-func (s *serviceProvider) DBDriver(ctx context.Context) pgClientRepoPort.DB {
+func (s *serviceProvider) DBDriver(ctx context.Context) pgClient.DB {
 	if s.dbDriver == nil {
 		dsn := fmt.Sprintf(
 			"host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
@@ -65,7 +64,7 @@ func (s *serviceProvider) DBDriver(ctx context.Context) pgClientRepoPort.DB {
 			s.Config().Database.Db,
 			s.Config().Database.Pass,
 		)
-		db, err := pgClientDriver.NewDB(ctx, dsn)
+		db, err := pgClient.NewDB(ctx, dsn)
 		if err != nil {
 			log.Fatalf("failed to create db driver: %v", err)
 		}
@@ -76,9 +75,9 @@ func (s *serviceProvider) DBDriver(ctx context.Context) pgClientRepoPort.DB {
 	return s.dbDriver
 }
 
-func (s *serviceProvider) DBClient(ctx context.Context) pgClientRepoPort.Client {
+func (s *serviceProvider) DBClient(ctx context.Context) pgClient.Client {
 	if s.dbClient == nil {
-		cl, err := pgClientService.New(s.DBDriver(ctx))
+		cl, err := pgClient.New(s.DBDriver(ctx))
 		if err != nil {
 			log.Fatalf("failed to create db client: %v", err)
 		}
@@ -87,7 +86,7 @@ func (s *serviceProvider) DBClient(ctx context.Context) pgClientRepoPort.Client 
 		if err != nil {
 			log.Fatalf("ping error: %s", err.Error())
 		}
-		Add(cl.Close)
+		clsr.Add(cl.Close)
 
 		s.dbClient = cl
 	}
@@ -95,9 +94,9 @@ func (s *serviceProvider) DBClient(ctx context.Context) pgClientRepoPort.Client 
 	return s.dbClient
 }
 
-func (s *serviceProvider) TxManager(ctx context.Context) txManagerRepoPort.TxManager {
+func (s *serviceProvider) TxManager(ctx context.Context) txManager.TxManager {
 	if s.txManager == nil {
-		s.txManager = txManagerDriver.NewTransactionManager(s.DBClient(ctx).DB())
+		s.txManager = txManager.NewTransactionManager(s.DBClient(ctx).DB())
 	}
 
 	return s.txManager

@@ -6,7 +6,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	dto "github.com/pillarion/practice-chat-server/internal/core/dto/postgresql"
 	desc "github.com/pillarion/practice-chat-server/internal/core/model/message"
-	db "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgclient"
+	db "github.com/pillarion/practice-platform/pkg/dbclient"
 )
 
 // InsertMessage inserts a message into the database.

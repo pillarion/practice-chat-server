@@ -7,6 +7,8 @@ import (
 )
 
 // Repo is the interface for the chat repository.
+//
+//go:generate minimock -o mock/ -s "_minimock.go"
 type Repo interface {
 	// InsertUser inserts a new user into the database.
 	//

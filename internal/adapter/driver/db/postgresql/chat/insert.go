@@ -6,7 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	desc "github.com/pillarion/practice-chat-server/internal/core/model/chat"
-	db "github.com/pillarion/practice-chat-server/internal/core/tools/dbclient/port/pgclient"
+	db "github.com/pillarion/practice-platform/pkg/dbclient"
 )
 
 // InsertChat inserts a chat into the database for the given usernames.
