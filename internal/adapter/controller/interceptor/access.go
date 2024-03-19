@@ -7,8 +7,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-
-	grpcAccess "github.com/pillarion/practice-chat-server/internal/core/tools/access_v1"
 )
 
 const authPrefix = "Bearer "
@@ -34,11 +32,9 @@ func (i *ChatServerInterceptor) VerifyAccessInterceptor(ctx context.Context, req
 	md = metadata.New(map[string]string{"Authorization": "Bearer " + accessToken})
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
-	_, err := i.accessClient.Check(
+	err := i.accessClient.Check(
 		ctx,
-		&grpcAccess.CheckRequest{
-			EndpointAddress: info.FullMethod,
-		},
+		info.FullMethod,
 	)
 	if err != nil {
 		return nil, err

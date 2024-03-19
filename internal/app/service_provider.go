@@ -27,7 +27,8 @@ import (
 	pgClient "github.com/pillarion/practice-platform/pkg/dbclient"
 	txManager "github.com/pillarion/practice-platform/pkg/pgtxmanager"
 
-	accessClient "github.com/pillarion/practice-chat-server/internal/core/tools/access_v1"
+	accessClientDriver "github.com/pillarion/practice-chat-server/internal/core/tools/access_v1"
+	accessClient "github.com/pillarion/practice-chat-server/internal/core/tools/client/access"
 )
 
 type serviceProvider struct {
@@ -44,7 +45,8 @@ type serviceProvider struct {
 
 	chatServer *grpcChatController.Server
 
-	accessClient accessClient.AccessV1Client
+	accessClientDriver accessClientDriver.AccessV1Client
+	accessClient       accessClient.V1Client
 
 	interceptor *interceptor.ChatServerInterceptor
 }
@@ -179,8 +181,8 @@ func (s *serviceProvider) ChatServer(ctx context.Context) *grpcChatController.Se
 }
 
 // AccessClient returns an access client
-func (s *serviceProvider) AccessClient(_ context.Context) accessClient.AccessV1Client {
-	if s.accessClient == nil {
+func (s *serviceProvider) AccessClientDriver(_ context.Context) accessClientDriver.AccessV1Client {
+	if s.accessClientDriver == nil {
 		pemServerCA, err := os.ReadFile(s.Config().Access.CAcert)
 		if err != nil {
 			log.Fatal("failed to load server CA's certificate")
@@ -205,9 +207,17 @@ func (s *serviceProvider) AccessClient(_ context.Context) accessClient.AccessV1C
 			log.Fatalf("failed to create access client: %v", err)
 		}
 
-		cl := accessClient.NewAccessV1Client(conn)
+		cl := accessClientDriver.NewAccessV1Client(conn)
 
-		s.accessClient = cl
+		s.accessClientDriver = cl
+	}
+
+	return s.accessClientDriver
+}
+
+func (s *serviceProvider) AccessClient(ctx context.Context) accessClient.V1Client {
+	if s.accessClient == nil {
+		s.accessClient = accessClient.NewV1Client(s.AccessClientDriver(ctx))
 	}
 
 	return s.accessClient
