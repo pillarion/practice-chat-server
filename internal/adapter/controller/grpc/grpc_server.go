@@ -5,6 +5,7 @@ import (
 	desc "github.com/pillarion/practice-chat-server/pkg/chat_v1"
 )
 
+// Server implements desc.ChatV1Server.
 type Server struct {
 	desc.UnimplementedChatV1Server
 	chatService chat.Service

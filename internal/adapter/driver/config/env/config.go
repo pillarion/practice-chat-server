@@ -15,6 +15,9 @@ const (
 	pgPassEnv  = "POSTGRES_PASSWORD"
 	pgHostEnv  = "POSTGRES_HOST"
 	pgPortEnv  = "POSTGRES_PORT"
+
+	accessAddressEnv = "ACCESS_ADDRESS"
+	accessCAcertEnv  = "ACCESS_CACERT"
 )
 
 // Get retrieves the configuration for the application.
@@ -56,6 +59,16 @@ func Get() (*ecfg.Config, error) {
 		return nil, err
 	}
 
+	accessAddress, err := getEnv(accessAddressEnv)
+	if err != nil {
+		return nil, err
+	}
+
+	accessCACert, err := getEnv(accessCAcertEnv)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ecfg.Config{
 		GRPC: ecfg.GRPC{
 			Port: grpcPortInt,
@@ -66,6 +79,10 @@ func Get() (*ecfg.Config, error) {
 			Pass: pgpass,
 			Host: pghost,
 			Port: pgport,
+		},
+		Access: ecfg.Access{
+			Address: accessAddress,
+			CAcert:  accessCACert,
 		},
 	}, nil
 }
