@@ -23,7 +23,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	clsr "github.com/pillarion/practice-platform/pkg/closer"
+	closer "github.com/pillarion/practice-platform/pkg/closer"
 	pgClient "github.com/pillarion/practice-platform/pkg/dbclient"
 	txManager "github.com/pillarion/practice-platform/pkg/pgtxmanager"
 
@@ -100,7 +100,7 @@ func (s *serviceProvider) DBClient(ctx context.Context) pgClient.Client {
 		if err != nil {
 			log.Fatalf("ping error: %s", err.Error())
 		}
-		clsr.Add(cl.Close)
+		closer.Add(cl.Close)
 
 		s.dbClient = cl
 	}
@@ -206,6 +206,7 @@ func (s *serviceProvider) AccessClientDriver(_ context.Context) accessClientDriv
 		if err != nil {
 			log.Fatalf("failed to create access client: %v", err)
 		}
+		closer.Add(conn.Close)
 
 		cl := accessClientDriver.NewAccessV1Client(conn)
 
