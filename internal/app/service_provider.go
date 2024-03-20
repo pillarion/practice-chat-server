@@ -181,7 +181,7 @@ func (s *serviceProvider) ChatServer(ctx context.Context) *grpcChatController.Se
 }
 
 // AccessClient returns an access client
-func (s *serviceProvider) AccessClientDriver(_ context.Context) accessClientDriver.AccessV1Client {
+func (s *serviceProvider) AccessClientDriver(ctx context.Context) accessClientDriver.AccessV1Client {
 	if s.accessClientDriver == nil {
 		pemServerCA, err := os.ReadFile(s.Config().Access.CAcert)
 		if err != nil {
@@ -199,7 +199,7 @@ func (s *serviceProvider) AccessClientDriver(_ context.Context) accessClientDriv
 			MinVersion: tls.VersionTLS12,
 		}
 
-		conn, err := grpc.Dial(
+		conn, err := grpc.DialContext(ctx,
 			s.Config().Access.Address,
 			grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
 		)
@@ -227,10 +227,6 @@ func (s *serviceProvider) AccessClient(ctx context.Context) accessClient.V1Clien
 func (s *serviceProvider) Interceptor(ctx context.Context) *interceptor.ChatServerInterceptor {
 	if s.interceptor == nil {
 		s.interceptor = interceptor.NewChatServerInterceptor(s.AccessClient(ctx))
-	}
-
-	if s.interceptor == nil {
-		log.Fatalf("failed to create interceptor")
 	}
 
 	return s.interceptor
