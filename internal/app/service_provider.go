@@ -2,10 +2,14 @@ package app
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"log"
+	"os"
 
 	grpcChatController "github.com/pillarion/practice-chat-server/internal/adapter/controller/grpc"
+	"github.com/pillarion/practice-chat-server/internal/adapter/controller/interceptor"
 	configDriver "github.com/pillarion/practice-chat-server/internal/adapter/driver/config/env"
 	pgChatDriver "github.com/pillarion/practice-chat-server/internal/adapter/driver/db/postgresql/chat"
 	pgJournalDriver "github.com/pillarion/practice-chat-server/internal/adapter/driver/db/postgresql/journal"
@@ -16,10 +20,15 @@ import (
 	messageRepoPort "github.com/pillarion/practice-chat-server/internal/core/port/repository/message"
 	chatServicePort "github.com/pillarion/practice-chat-server/internal/core/port/service/chat"
 	chatService "github.com/pillarion/practice-chat-server/internal/core/service/chat"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
-	clsr "github.com/pillarion/practice-platform/pkg/closer"
+	closer "github.com/pillarion/practice-platform/pkg/closer"
 	pgClient "github.com/pillarion/practice-platform/pkg/dbclient"
 	txManager "github.com/pillarion/practice-platform/pkg/pgtxmanager"
+
+	accessClientDriver "github.com/pillarion/practice-chat-server/internal/core/tools/access_v1"
+	accessClient "github.com/pillarion/practice-chat-server/internal/core/tools/client/access"
 )
 
 type serviceProvider struct {
@@ -35,6 +44,11 @@ type serviceProvider struct {
 	chatService chatServicePort.Service
 
 	chatServer *grpcChatController.Server
+
+	accessClientDriver accessClientDriver.AccessV1Client
+	accessClient       accessClient.V1Client
+
+	interceptor *interceptor.ChatServerInterceptor
 }
 
 func newServiceProvider() *serviceProvider {
@@ -86,7 +100,7 @@ func (s *serviceProvider) DBClient(ctx context.Context) pgClient.Client {
 		if err != nil {
 			log.Fatalf("ping error: %s", err.Error())
 		}
-		clsr.Add(cl.Close)
+		closer.Add(cl.Close)
 
 		s.dbClient = cl
 	}
@@ -164,4 +178,56 @@ func (s *serviceProvider) ChatServer(ctx context.Context) *grpcChatController.Se
 	}
 
 	return s.chatServer
+}
+
+// AccessClient returns an access client
+func (s *serviceProvider) AccessClientDriver(ctx context.Context) accessClientDriver.AccessV1Client {
+	if s.accessClientDriver == nil {
+		pemServerCA, err := os.ReadFile(s.Config().Access.CAcert)
+		if err != nil {
+			log.Fatal("failed to load server CA's certificate")
+		}
+
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(pemServerCA) {
+			log.Fatal("failed to add server CA's certificate")
+		}
+
+		// Create the credentials and return it
+		tlsConfig := &tls.Config{
+			RootCAs:    certPool,
+			MinVersion: tls.VersionTLS12,
+		}
+
+		conn, err := grpc.DialContext(ctx,
+			s.Config().Access.Address,
+			grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+		)
+		if err != nil {
+			log.Fatalf("failed to create access client: %v", err)
+		}
+		closer.Add(conn.Close)
+
+		cl := accessClientDriver.NewAccessV1Client(conn)
+
+		s.accessClientDriver = cl
+	}
+
+	return s.accessClientDriver
+}
+
+func (s *serviceProvider) AccessClient(ctx context.Context) accessClient.V1Client {
+	if s.accessClient == nil {
+		s.accessClient = accessClient.NewV1Client(s.AccessClientDriver(ctx))
+	}
+
+	return s.accessClient
+}
+
+func (s *serviceProvider) Interceptor(ctx context.Context) *interceptor.ChatServerInterceptor {
+	if s.interceptor == nil {
+		s.interceptor = interceptor.NewChatServerInterceptor(s.AccessClient(ctx))
+	}
+
+	return s.interceptor
 }
